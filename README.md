@@ -12,6 +12,16 @@ Enriched **Minna no Nihongo** Anki deck generator. Produces a single `.apkg` wit
 
 Final deck: ~55 MB, 2,156 vocab + 4,310 quiz + 1 info card.
 
+## Screenshots
+
+<table>
+  <tr>
+    <td align="center"><img src="assets/screenshots/start-here.png" alt="Start Here info card" width="280"/><br/><sub>Start Here info card</sub></td>
+    <td align="center"><img src="assets/screenshots/deck-overview.png" alt="Lesson 01 deck overview" width="280"/><br/><sub>Per-lesson deck overview</sub></td>
+    <td align="center"><img src="assets/screenshots/card-back.png" alt="Vocab card back" width="280"/><br/><sub>Vocab card with pitch, kanji stroke, sentence, mnemonic, mascot</sub></td>
+  </tr>
+</table>
+
 ## Quick start
 
 ```bash
@@ -96,8 +106,11 @@ src/mnn/
 
 ## Author
 
-Pavel · [iampavel.dev](https://iampavel.dev) · [contact@iampavel.dev](mailto:contact@iampavel.dev)
+Asaduzzaman Pavel · [iampavel.dev](https://iampavel.dev) · [contact@iampavel.dev](mailto:contact@iampavel.dev)
 
 ## License
 
-MIT
+- **Source code** (`src/mnn/`, configs): MIT — see [`LICENSE`](LICENSE)
+- **Generated deck + bundled media**: CC BY-SA 4.0 (inherited from KanjiVG + JMdict)
+
+Third-party data sources, licenses, and obligations are documented in [`ATTRIBUTIONS.md`](ATTRIBUTIONS.md).
