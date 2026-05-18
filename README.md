@@ -12,6 +12,8 @@ Enriched **Minna no Nihongo** Anki deck generator. Produces a single `.apkg` wit
 
 Final deck: ~55 MB, 2,156 vocab + 4,310 quiz + 1 info card.
 
+**🌐 Browse online:** https://k1ng440.github.io/minna-no-nihongo-anki/
+
 ## Screenshots
 
 <table>
@@ -96,6 +98,8 @@ uv run mnn web
 ```
 
 Outputs `docs/` (~51 MB) — browsable static site with the same data as the deck.
+
+**Live demo:** https://k1ng440.github.io/minna-no-nihongo-anki/
 
 **Enable GitHub Pages from `/docs`:**
 1. Push to GitHub.
