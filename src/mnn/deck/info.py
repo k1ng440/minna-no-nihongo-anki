@@ -45,7 +45,7 @@ def build() -> str:
 <ul style="{_UL}">
 <li style="{_LI}"><b>Pitch accent:</b> red bar over high mora, red drop bar marks the pitch fall (Tokyo dialect).</li>
 <li style="{_LI}"><b>Mnemonic:</b> the 🧠 box links the kana sound to an English association — read it once when you first see the word.</li>
-<li style="{_LI}"><b>Kanji animation:</b> SVG strokes draw in correct order — watch it once to learn the path.</li>
+<li style="{_LI}"><b>Kanji animation:</b> SVG strokes draw in correct order — watch it once to learn the path. <b>Tap the kanji to replay</b> the stroke sequence.</li>
 <li style="{_LI}"><b>Mascot &amp; progress bar:</b> at the bottom of every card. Mascot evolves every 10 lessons.</li>
 </ul>
 

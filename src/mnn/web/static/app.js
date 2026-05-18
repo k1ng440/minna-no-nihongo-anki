@@ -1,5 +1,49 @@
 "use strict";
 
+const I18N = {
+  en: {
+    brand: "Vocab",
+    search_ph: "Search kanji / kana / meaning…",
+    f_kanji: "has kanji",
+    f_sentence: "has sentence",
+    f_mnemonic: "has mnemonic",
+    f_learned: "hide learned",
+    start_here: "📖 Start Here",
+    all_lessons: "All lessons",
+    lesson_prefix: "Lesson",
+    cards_suffix: "cards",
+    no_matches: "No matches.",
+    by: "by",
+    word_audio: "🔊 word",
+    sentence_audio: "🔊 sentence",
+    learned: "✓ learned",
+    mark_learned: "mark learned",
+    about: "About this deck",
+  },
+  bn: {
+    brand: "শব্দভান্ডার",
+    search_ph: "কাঞ্জি / কানা / অর্থ খুঁজুন…",
+    f_kanji: "কাঞ্জি আছে",
+    f_sentence: "বাক্য আছে",
+    f_mnemonic: "mnemonic আছে",
+    f_learned: "শেখা হয়েছে লুকান",
+    start_here: "📖 শুরু এখান থেকে",
+    all_lessons: "সব পাঠ",
+    lesson_prefix: "পাঠ",
+    cards_suffix: "টি কার্ড",
+    no_matches: "কিছু পাওয়া যায়নি।",
+    by: "তৈরি করেছেন",
+    word_audio: "🔊 শব্দ",
+    sentence_audio: "🔊 বাক্য",
+    learned: "✓ শেখা হয়েছে",
+    mark_learned: "শেখা হয়েছে চিহ্নিত করুন",
+    about: "এই deck সম্পর্কে",
+  },
+};
+
+let lang = localStorage.getItem("mnn-lang") || "en";
+const t = (key) => I18N[lang][key] ?? I18N.en[key] ?? key;
+
 let DATA = null;
 let state = {
   lesson: null,    // null = "all"; 0 = intro; 1..50
@@ -21,9 +65,18 @@ const el = (tag, props = {}, ...children) => {
   return e;
 };
 
+function applyI18n() {
+  document.documentElement.lang = lang;
+  $("#search").placeholder = t("search_ph");
+  document.querySelectorAll("[data-i18n]").forEach((el) => {
+    el.textContent = t(el.dataset.i18n);
+  });
+}
+
 async function boot() {
   const res = await fetch("data/vocab.json");
   DATA = await res.json();
+  applyI18n();
   renderLessons();
   renderIntro();
   bindUi();
@@ -44,6 +97,15 @@ function bindUi() {
     });
   }
   $("#menu-btn").addEventListener("click", () => $("#sidebar").classList.toggle("open"));
+  $("#lang-btn").addEventListener("click", () => {
+    lang = lang === "en" ? "bn" : "en";
+    localStorage.setItem("mnn-lang", lang);
+    applyI18n();
+    document.querySelector("#lessons").innerHTML = "";
+    renderLessons();
+    renderIntro();
+    render();
+  });
   $("#theme-btn").addEventListener("click", () => {
     const root = document.documentElement;
     const cur = root.classList.contains("dark") ? "dark" : root.classList.contains("light") ? "light" : "";
@@ -73,27 +135,27 @@ function renderLessons() {
     });
     return li;
   };
-  ul.append(make(0, "📖 Start Here", "1"));
-  ul.append(make(-1, "All lessons", DATA.cards.length + ""));
+  ul.append(make(0, t("start_here"), "1"));
+  ul.append(make(-1, t("all_lessons"), DATA.cards.length + ""));
   for (const lesson of DATA.lessons) {
-    ul.append(make(lesson.n, "Lesson " + String(lesson.n).padStart(2, "0"), lesson.count + ""));
+    ul.append(make(lesson.n, t("lesson_prefix") + " " + String(lesson.n).padStart(2, "0"), lesson.count + ""));
   }
   state.lesson = -1;
   document.querySelectorAll("#lessons li").forEach((x) => x.classList.toggle("active", x.dataset.id == -1));
 }
 
 function renderIntro() {
-  $("#intro").innerHTML = DATA.intro_html;
+  $("#intro").innerHTML = (lang === "bn" && DATA.intro_html_bn) ? DATA.intro_html_bn : DATA.intro_html;
 }
 
 function matchCard(c) {
   if (state.filters.kanji && !c.kanji) return false;
   if (state.filters.sentence && !c.sentence_jp) return false;
-  if (state.filters.mnemonic && !c.mnemonic) return false;
+  if (state.filters.mnemonic && !c.mnemonic && !c.mnemonic_bn) return false;
   if (state.filters.learned && learned.has(c.guid)) return false;
   if (state.query) {
     const q = state.query;
-    const hay = (c.kanji + " " + c.kana + " " + c.meaning + " " + (c.mnemonic || "")).toLowerCase();
+    const hay = (c.kanji + " " + c.kana + " " + c.meaning + " " + (c.meaning_bn || "") + " " + (c.mnemonic || "") + " " + (c.mnemonic_bn || "")).toLowerCase();
     if (!hay.includes(q)) return false;
   }
   return true;
@@ -107,7 +169,7 @@ function render() {
   intro.style.display = state.lesson === 0 ? "block" : "none";
   if (state.lesson === 0) {
     empty.hidden = true;
-    $("#stats").textContent = "About this deck";
+    $("#stats").textContent = t("about");
     return;
   }
 
@@ -115,8 +177,9 @@ function render() {
   if (state.lesson > 0) list = list.filter((c) => c.lesson === state.lesson);
   list = list.filter(matchCard);
 
-  $("#stats").textContent = `${list.length} cards`;
+  $("#stats").textContent = `${list.length} ${t("cards_suffix")}`;
   empty.hidden = list.length > 0;
+  empty.textContent = t("no_matches");
 
   for (const c of list) cards.append(renderCard(c));
 }
@@ -131,12 +194,18 @@ function renderCard(c) {
   const theme = el("div", { className: "theme" });
   theme.style.background = c.theme;
   wrap.append(theme);
-  wrap.append(el("div", { className: "lesson-tag" }, `Lesson ${c.lesson} ${c.emoji}`));
+  wrap.append(el("div", { className: "lesson-tag" }, `${t("lesson_prefix")} ${c.lesson} ${c.emoji}`));
   if (c.kanji) wrap.append(el("div", { className: "jp" }, c.kanji));
   const kana = el("div", { className: "kana" });
   kana.innerHTML = pitchHtml(c);
   wrap.append(kana);
-  wrap.append(el("div", { className: "meaning" }, c.meaning));
+  const meaningText = (lang === "bn" && c.meaning_bn) ? c.meaning_bn : c.meaning;
+  wrap.append(el("div", { className: "meaning" }, meaningText));
+  if (lang === "bn" && c.meaning_bn && c.meaning) {
+    wrap.append(el("div", { className: "meaning meaning-secondary" }, c.meaning));
+  } else if (lang === "en" && c.meaning_bn) {
+    wrap.append(el("div", { className: "meaning meaning-secondary" }, c.meaning_bn));
+  }
 
   if (expanded) {
     if (c.kanji_svgs.length) {
@@ -147,16 +216,18 @@ function renderCard(c) {
     if (c.sentence_jp) {
       const s = el("div", { className: "sentence" });
       s.append(el("div", { className: "sentence-jp" }, c.sentence_jp));
-      s.append(el("div", { className: "sentence-en" }, c.sentence_en));
+      const trans = (lang === "bn" && c.sentence_bn) ? c.sentence_bn : c.sentence_en;
+      if (trans) s.append(el("div", { className: "sentence-en" }, trans));
       wrap.append(s);
     }
-    if (c.mnemonic) wrap.append(el("div", { className: "mnemonic" }, c.mnemonic));
+    const mnemoText = (lang === "bn" && c.mnemonic_bn) ? c.mnemonic_bn : c.mnemonic;
+    if (mnemoText) wrap.append(el("div", { className: "mnemonic" }, mnemoText));
   }
 
   const actions = el("div", { className: "actions" });
-  if (c.audio) actions.append(audioBtn("🔊 word", "audio/" + c.audio));
-  if (c.sentence_audio) actions.append(audioBtn("🔊 sentence", "audio_sent/" + c.sentence_audio));
-  const learn = el("button", { className: "learn" + (learned.has(c.guid) ? " on" : "") }, learned.has(c.guid) ? "✓ learned" : "mark learned");
+  if (c.audio) actions.append(audioBtn(t("word_audio"), "audio/" + c.audio));
+  if (c.sentence_audio) actions.append(audioBtn(t("sentence_audio"), "audio_sent/" + c.sentence_audio));
+  const learn = el("button", { className: "learn" + (learned.has(c.guid) ? " on" : "") }, learned.has(c.guid) ? t("learned") : t("mark_learned"));
   learn.addEventListener("click", (e) => {
     e.stopPropagation();
     if (learned.has(c.guid)) learned.delete(c.guid);

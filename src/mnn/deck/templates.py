@@ -10,10 +10,14 @@ CSS = """.card { font-family: "Noto Sans CJK JP","Hiragino Sans",sans-serif; fon
 .pitch .lo { border-top: 3px solid transparent; }
 .pitch .drop { border-right: 3px solid #e74c3c; padding-right: 3px; }
 .meaning { font-size: 22px; color: #2ecc71; margin: 10px 0; font-weight: 500; }
+.meaning-bn { font-size: 20px; color: #f39c12; margin: 4px 0 10px; font-weight: 500; }
 .sentence-jp { font-size: 22px; margin: 14px 0 4px; }
-.sentence-en { font-size: 16px; opacity: 0.7; margin-bottom: 8px; font-style: italic; }
+.sentence-en { font-size: 16px; opacity: 0.7; margin-bottom: 4px; font-style: italic; }
+.sentence-bn { font-size: 16px; opacity: 0.7; margin-bottom: 8px; }
 .mnemonic { font-style: italic; color: #b89cef; background: rgba(160,120,220,0.15); padding: 10px 14px; border-radius: 10px; margin: 12px auto; max-width: 90%; font-size: 17px; text-align: left; }
 .mnemonic::before { content: "🧠 "; }
+.mnemonic-bn { color: #e67e22; background: rgba(230,126,34,0.12); padding: 10px 14px; border-radius: 10px; margin: 8px auto; max-width: 90%; font-size: 16px; text-align: left; }
+.mnemonic-bn::before { content: "🧠 "; }
 .kanji-svg svg { width: 140px; height: 140px; stroke: currentColor; }
 .kanji-svg svg path { stroke: currentColor !important; }
 .kanji-svgs { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; margin: 10px 0; }
@@ -40,12 +44,15 @@ VOCAB_TEMPLATES = [
 {{#Kanji}}<div class="jp">{{Kanji}}</div><div class="kana">{{KanaPitch}}</div>{{/Kanji}}{{^Kanji}}<div class="jp">{{Kana}}</div>{{/Kanji}}""",
         "afmt": """{{FrontSide}}<hr id="answer">
 <div class="meaning">{{Meaning}}</div>
+{{#MeaningBn}}<div class="meaning-bn">{{MeaningBn}}</div>{{/MeaningBn}}
 <div class="audio">{{Audio}}</div>
 {{#KanjiSVG}}<div class="kanji-svgs">{{KanjiSVG}}</div>{{/KanjiSVG}}
 {{#Image}}<div class="image">{{Image}}</div>{{/Image}}
 {{#SentenceJP}}<div class="sentence-jp">{{SentenceJP}} {{SentenceAudio}}</div>
-<div class="sentence-en">{{SentenceEN}}</div>{{/SentenceJP}}
+<div class="sentence-en">{{SentenceEN}}</div>
+{{#SentenceBn}}<div class="sentence-bn">{{SentenceBn}}</div>{{/SentenceBn}}{{/SentenceJP}}
 {{#Mnemonic}}<div class="mnemonic">{{Mnemonic}}</div>{{/Mnemonic}}
+{{#MnemonicBn}}<div class="mnemonic-bn">{{MnemonicBn}}</div>{{/MnemonicBn}}
 <div class="footer">
   <div class="lesson-emoji">{{LessonEmoji}}</div>
   {{ProgressBar}}
@@ -61,8 +68,10 @@ VOCAB_TEMPLATES = [
 <div class="audio">{{Audio}}</div>
 {{#KanjiSVG}}<div class="kanji-svgs">{{KanjiSVG}}</div>{{/KanjiSVG}}
 {{#SentenceJP}}<div class="sentence-jp">{{SentenceJP}} {{SentenceAudio}}</div>
-<div class="sentence-en">{{SentenceEN}}</div>{{/SentenceJP}}
+<div class="sentence-en">{{SentenceEN}}</div>
+{{#SentenceBn}}<div class="sentence-bn">{{SentenceBn}}</div>{{/SentenceBn}}{{/SentenceJP}}
 {{#Mnemonic}}<div class="mnemonic">{{Mnemonic}}</div>{{/Mnemonic}}
+{{#MnemonicBn}}<div class="mnemonic-bn">{{MnemonicBn}}</div>{{/MnemonicBn}}
 <div class="footer"><div class="lesson-emoji">{{LessonEmoji}}</div>{{ProgressBar}}<div class="mascot">{{Mascot}}</div></div>""",
     },
     {
@@ -72,6 +81,7 @@ VOCAB_TEMPLATES = [
         "afmt": """{{FrontSide}}<hr id="answer">
 {{#Kanji}}<div class="jp">{{Kanji}}</div><div class="kana">{{KanaPitch}}</div>{{/Kanji}}{{^Kanji}}<div class="jp">{{Kana}}</div>{{/Kanji}}
 <div class="meaning">{{Meaning}}</div>
+{{#MeaningBn}}<div class="meaning-bn">{{MeaningBn}}</div>{{/MeaningBn}}
 {{#Image}}<div class="image">{{Image}}</div>{{/Image}}
 <div class="footer"><div class="lesson-emoji">{{LessonEmoji}}</div>{{ProgressBar}}<div class="mascot">{{Mascot}}</div></div>""",
     },
@@ -85,6 +95,7 @@ VOCAB_TEMPLATES = [
 {{#Kanji}}<div class="jp" style="font-size:36px">{{Kanji}}</div>{{/Kanji}}
 <div class="kana">{{KanaPitch}}</div>
 <div class="meaning">{{Meaning}}</div>
+{{#MeaningBn}}<div class="meaning-bn">{{MeaningBn}}</div>{{/MeaningBn}}
 <div class="footer"><div class="lesson-emoji">{{LessonEmoji}}</div>{{ProgressBar}}<div class="mascot">{{Mascot}}</div></div>{{/SentenceCloze}}""",
     },
     {
@@ -95,6 +106,7 @@ VOCAB_TEMPLATES = [
 <div class="jp">{{Kanji}}</div>
 <div class="kana">{{KanaPitch}}</div>
 <div class="meaning">{{Meaning}}</div>
+{{#MeaningBn}}<div class="meaning-bn">{{MeaningBn}}</div>{{/MeaningBn}}
 <div class="audio">{{Audio}}</div>
 <div class="footer"><div class="lesson-emoji">{{LessonEmoji}}</div>{{ProgressBar}}<div class="mascot">{{Mascot}}</div></div>{{/KanjiSVG}}""",
     },

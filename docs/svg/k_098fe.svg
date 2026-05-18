@@ -34,7 +34,8 @@ kvg:phon CDATA #IMPLIED >
 xmlns:kvg CDATA #FIXED "http://kanjivg.tagaini.net"
 kvg:type CDATA #IMPLIED >
 ]>
-<svg xmlns="http://www.w3.org/2000/svg" width="109" height="109" viewBox="0 0 109 109"><style>
+<svg xmlns="http://www.w3.org/2000/svg" width="109" height="109" viewBox="0 0 109 109" onclick="this.querySelectorAll('path').forEach(p=><style>
+svg { cursor: pointer; }
 svg path { fill: none; stroke: currentColor; stroke-width: 3; stroke-linecap: round;
 stroke-dasharray: 200; stroke-dashoffset: 200; animation: draw 1.2s forwards; }
 @keyframes draw { to { stroke-dashoffset: 0; } }
@@ -50,7 +51,7 @@ svg path[id$="-s9"] { animation-delay: 6.40s; }
 svg path[id$="-s10"] { animation-delay: 7.20s; }
 svg path[id$="-s11"] { animation-delay: 8.00s; }
 svg path[id$="-s12"] { animation-delay: 8.80s; }
-svg path[id$="-s13"] { animation-delay: 9.60s; }</style>
+svg path[id$="-s13"] { animation-delay: 9.60s; }</style>{p.style.animation='none';void p.offsetWidth;p.style.animation=''});">
 <g id="kvg:StrokePaths_098fe" style="fill:none;stroke:#000000;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;">
 <g id="kvg:098fe" kvg:element="飾">
 	<g id="kvg:098fe-g1" kvg:element="飠" kvg:original="食" kvg:partial="true" kvg:position="left" kvg:radical="general" kvg:phon="食">

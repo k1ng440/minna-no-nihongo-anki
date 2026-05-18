@@ -53,6 +53,7 @@ header h1 .muted { font-weight: 400; font-size: 14px; }
 .card .pitch .lo { border-top: 3px solid transparent; }
 .card .pitch .drop { border-right: 3px solid var(--accent); padding-right: 3px; }
 .card .meaning { font-size: 15px; color: var(--green); margin-top: 6px; font-weight: 500; }
+.card .meaning-secondary { font-size: 13px; color: #f39c12; margin-top: 2px; font-weight: 400; }
 .card .actions { display: flex; gap: 8px; margin-top: 10px; align-items: center; }
 .card .actions button { background: var(--hover); border: 1px solid var(--border); border-radius: 6px; padding: 4px 10px; cursor: pointer; color: var(--fg); font-size: 13px; }
 .card .actions button:hover { background: var(--accent); color: #fff; border-color: var(--accent); }

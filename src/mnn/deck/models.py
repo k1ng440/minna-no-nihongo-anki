@@ -20,6 +20,7 @@ VOCAB_MODEL = genanki.Model(
         {"name": "KanjiSVG"}, {"name": "Mnemonic"}, {"name": "Image"},
         {"name": "Mascot"}, {"name": "LessonTheme"}, {"name": "LessonEmoji"},
         {"name": "ProgressBar"},
+        {"name": "MeaningBn"}, {"name": "MnemonicBn"}, {"name": "SentenceBn"},
     ],
     templates=VOCAB_TEMPLATES,
     css=CSS,

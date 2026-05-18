@@ -11,6 +11,10 @@ from mnn.deck.models import INFO_MODEL, QUIZ_MODEL, VOCAB_MODEL
 from mnn.deck.themes import THEMES, tier
 from mnn.enrich.pitch import render_or_plain
 from mnn.paths import ASSETS, AUDIO, AUDIO_SENT, CACHE, CACHE_MNEMONICS, CACHE_QUIZ, CACHE_SENTENCES, IMAGES, SVG
+
+BN_MEANINGS = CACHE / "meanings_bn"
+BN_MNEMONICS = CACHE / "mnemonics_bn"
+BN_SENTENCES = CACHE / "sentences_bn"
 from mnn.util.io import read_json
 
 logger = log.get(__name__)
@@ -75,6 +79,9 @@ def run() -> None:
         rows = read_json(cleaned_f)
         sents = read_json(CACHE_SENTENCES / f"lesson_{n}.json") if (CACHE_SENTENCES / f"lesson_{n}.json").exists() else {}
         mnem = read_json(CACHE_MNEMONICS / f"lesson_{n}.json") if (CACHE_MNEMONICS / f"lesson_{n}.json").exists() else {}
+        bn_meanings = read_json(BN_MEANINGS / f"lesson_{n}.json") if (BN_MEANINGS / f"lesson_{n}.json").exists() else {}
+        bn_mnem = read_json(BN_MNEMONICS / f"lesson_{n}.json") if (BN_MNEMONICS / f"lesson_{n}.json").exists() else {}
+        bn_sents = read_json(BN_SENTENCES / f"lesson_{n}.json") if (BN_SENTENCES / f"lesson_{n}.json").exists() else {}
         theme = THEMES[n]
         mascot_svg = _load_mascot(n)
         progress = _progress_bar(n, theme["color"])
@@ -94,7 +101,7 @@ def run() -> None:
             kana_pitch = render_or_plain(kanji, kana)
 
             sent = sents.get(kana)
-            sent_jp = sent_en = sent_audio = sent_cloze = ""
+            sent_jp = sent_en = sent_audio = sent_cloze = sent_bn = ""
             if sent:
                 sent_jp = html.escape(sent["jp"])
                 sent_en = html.escape(sent["en"])
@@ -105,6 +112,9 @@ def run() -> None:
                 cz = _cloze_sentence(sent["jp"], [kanji, kana])
                 if cz:
                     sent_cloze = cz
+                bn_translated = bn_sents.get(sent["en"])
+                if bn_translated:
+                    sent_bn = html.escape(bn_translated)
 
             kanji_html = _kanji_svg_html(kanji, svg_map)
             for ch in kanji:
@@ -119,6 +129,9 @@ def run() -> None:
                     kana_pitch, sent_jp, sent_en, sent_audio, sent_cloze,
                     kanji_html, html.escape(mnem.get(row["guid"]) or ""), "",
                     mascot_svg, theme["color"], theme["emoji"], progress,
+                    html.escape(bn_meanings.get(meaning) or ""),
+                    html.escape(bn_mnem.get(row["guid"]) or ""),
+                    sent_bn,
                 ],
                 guid=genanki.guid_for(row["guid"]),
             )

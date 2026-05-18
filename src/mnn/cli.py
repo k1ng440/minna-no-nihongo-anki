@@ -147,6 +147,40 @@ def enrich_quiz() -> None:
     quiz.run()
 
 
+@enrich_app.command("meanings-bn")
+def enrich_meanings_bn() -> None:
+    """LLM-translate meanings to Bangladeshi modern Bengali."""
+    from mnn.enrich import meanings_bn
+    import asyncio
+    asyncio.run(meanings_bn.run())
+
+
+@enrich_app.command("mnemonics-bn")
+def enrich_mnemonics_bn() -> None:
+    """LLM Bangla mnemonics (Bangladeshi modern Bengali)."""
+    from mnn.enrich import mnemonics_bn
+    import asyncio
+    asyncio.run(mnemonics_bn.run())
+
+
+@enrich_app.command("sentences-bn")
+def enrich_sentences_bn() -> None:
+    """LLM-translate Tatoeba EN sentences to Bangladeshi modern Bengali."""
+    from mnn.enrich import sentences_bn
+    import asyncio
+    asyncio.run(sentences_bn.run())
+
+
+@enrich_app.command("bn-all")
+def enrich_bn_all() -> None:
+    """Run all Bangla enrichments (meanings + mnemonics + sentences)."""
+    import asyncio
+    from mnn.enrich import meanings_bn, mnemonics_bn, sentences_bn
+    asyncio.run(meanings_bn.run())
+    asyncio.run(sentences_bn.run())
+    asyncio.run(mnemonics_bn.run())
+
+
 @enrich_app.command("all")
 def enrich_all() -> None:
     """Run all enrich steps."""

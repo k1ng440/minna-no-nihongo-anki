@@ -9,17 +9,18 @@
 <body>
 <header>
   <button id="menu-btn" aria-label="menu">☰</button>
-  <h1>みんなの日本語 <span class="muted">Vocab</span></h1>
-  <input id="search" type="search" placeholder="Search kanji / kana / meaning…" autocomplete="off">
+  <h1>みんなの日本語 <span class="muted" data-i18n="brand">Vocab</span></h1>
+  <input id="search" type="search" autocomplete="off">
+  <button id="lang-btn" aria-label="language" title="Toggle EN / বাংলা">🌐</button>
   <button id="theme-btn" aria-label="theme">🌓</button>
 </header>
 <div id="layout">
   <nav id="sidebar">
     <div id="filters">
-      <label><input type="checkbox" id="f-kanji"> has kanji</label>
-      <label><input type="checkbox" id="f-sentence"> has sentence</label>
-      <label><input type="checkbox" id="f-mnemonic"> has mnemonic</label>
-      <label><input type="checkbox" id="f-learned"> hide learned</label>
+      <label><input type="checkbox" id="f-kanji"> <span data-i18n="f_kanji">has kanji</span></label>
+      <label><input type="checkbox" id="f-sentence"> <span data-i18n="f_sentence">has sentence</span></label>
+      <label><input type="checkbox" id="f-mnemonic"> <span data-i18n="f_mnemonic">has mnemonic</span></label>
+      <label><input type="checkbox" id="f-learned"> <span data-i18n="f_learned">hide learned</span></label>
     </div>
     <ul id="lessons"></ul>
   </nav>

@@ -17,6 +17,10 @@ from mnn.paths import (
     ROOT,
     SVG,
 )
+
+BN_MEANINGS = CACHE / "meanings_bn"
+BN_MNEMONICS = CACHE / "mnemonics_bn"
+BN_SENTENCES = CACHE / "sentences_bn"
 from mnn.util.io import read_json
 
 logger = log.get(__name__)
@@ -37,6 +41,9 @@ def _gather() -> dict:
         rows = read_json(cleaned_f)
         sents = read_json(CACHE_SENTENCES / f"lesson_{n}.json") if (CACHE_SENTENCES / f"lesson_{n}.json").exists() else {}
         mnem = read_json(CACHE_MNEMONICS / f"lesson_{n}.json") if (CACHE_MNEMONICS / f"lesson_{n}.json").exists() else {}
+        bn_meanings = read_json(BN_MEANINGS / f"lesson_{n}.json") if (BN_MEANINGS / f"lesson_{n}.json").exists() else {}
+        bn_mnem = read_json(BN_MNEMONICS / f"lesson_{n}.json") if (BN_MNEMONICS / f"lesson_{n}.json").exists() else {}
+        bn_sents = read_json(BN_SENTENCES / f"lesson_{n}.json") if (BN_SENTENCES / f"lesson_{n}.json").exists() else {}
         theme = THEMES[n]
         lessons_meta.append({"n": n, "count": len(rows), "color": theme["color"], "emoji": theme["emoji"]})
 
@@ -51,12 +58,15 @@ def _gather() -> dict:
                 "kana": kana,
                 "kana_pitch": render_or_plain(kanji, kana),
                 "meaning": row["meaning"],
+                "meaning_bn": bn_meanings.get(row["meaning"]) or "",
                 "audio": row.get("audio") if (AUDIO / row.get("audio", "")).exists() else "",
                 "sentence_jp": sent.get("jp", ""),
                 "sentence_en": sent.get("en", ""),
+                "sentence_bn": bn_sents.get(sent.get("en", "")) or "",
                 "sentence_audio": sent.get("audio", "") if sent and (AUDIO_SENT / sent.get("audio", "")).exists() else "",
                 "kanji_svgs": [svg_map[c] for c in kanji if c in svg_map],
                 "mnemonic": mnem.get(row["guid"]) or "",
+                "mnemonic_bn": bn_mnem.get(row["guid"]) or "",
                 "theme": theme["color"],
                 "emoji": theme["emoji"],
             })

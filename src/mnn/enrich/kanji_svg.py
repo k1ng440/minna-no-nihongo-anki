@@ -12,16 +12,29 @@ CJK_RE = re.compile(r"[㐀-鿿]")
 TEXT_RE = re.compile(r"<text[^>]*>.*?</text>", flags=re.DOTALL)
 
 ANIM_CSS = """<style>
+svg { cursor: pointer; }
 svg path { fill: none; stroke: currentColor; stroke-width: 3; stroke-linecap: round;
 stroke-dasharray: 200; stroke-dashoffset: 200; animation: draw 1.2s forwards; }
 @keyframes draw { to { stroke-dashoffset: 0; } }
 </style>"""
+
+REPLAY_JS = (
+    "this.querySelectorAll('path').forEach(p=>{"
+    "p.style.animation='none';void p.offsetWidth;p.style.animation=''});"
+)
 
 MAP_FILE = CACHE / "kanji_svg_map.json"
 
 
 def inject_animation(svg: str) -> str:
     svg = TEXT_RE.sub("", svg)
+    # add onclick to <svg ...> tag for tap-to-replay
+    svg = re.sub(
+        r"<svg\b([^>]*)>",
+        lambda m: f'<svg{m.group(1)} onclick="{REPLAY_JS}">',
+        svg,
+        count=1,
+    )
     idx = svg.find(">", svg.find("<svg")) + 1
     svg = svg[:idx] + ANIM_CSS + svg[idx:]
     paths = re.findall(r'<path[^>]*id="kvg:[^"]*-s(\d+)"', svg)
