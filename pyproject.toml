@@ -1,11 +1,36 @@
 [project]
 name = "mnn-vocab"
-version = "0.1.0"
-description = "Minna no Nihongo enriched Anki deck generator"
+version = "1.0.0"
+description = "Enriched Anki deck generator for Minna no Nihongo I + II — 2,156 words with native audio, pitch accent, kanji stroke animations, mnemonics, and quizzes."
 readme = "README.md"
 requires-python = ">=3.11"
 license = { text = "MIT" }
-authors = [{ name = "Pavel", email = "contact@iampavel.dev" }]
+license-files = ["LICENSE"]
+authors = [{ name = "Asaduzzaman Pavel", email = "contact@iampavel.dev" }]
+keywords = [
+  "anki",
+  "japanese",
+  "minna-no-nihongo",
+  "flashcards",
+  "jlpt",
+  "spaced-repetition",
+  "vocabulary",
+  "kanji",
+  "language-learning",
+]
+classifiers = [
+  "Development Status :: 5 - Production/Stable",
+  "Environment :: Console",
+  "Intended Audience :: Education",
+  "License :: OSI Approved :: MIT License",
+  "Natural Language :: Japanese",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Education",
+  "Topic :: Software Development :: Libraries :: Python Modules",
+]
 dependencies = [
   "typer>=0.12",
   "rich>=13.7",
@@ -18,6 +43,14 @@ dependencies = [
   "openai>=1.40",
 ]
 
+[project.urls]
+Homepage = "https://github.com/k1ng440/minna-no-nihongo-anki"
+Repository = "https://github.com/k1ng440/minna-no-nihongo-anki"
+Issues = "https://github.com/k1ng440/minna-no-nihongo-anki/issues"
+Releases = "https://github.com/k1ng440/minna-no-nihongo-anki/releases"
+Changelog = "https://github.com/k1ng440/minna-no-nihongo-anki/blob/master/CHANGELOG.md"
+Author = "https://iampavel.dev"
+
 [project.scripts]
 mnn = "mnn.cli:app"
 
@@ -27,6 +60,12 @@ build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/mnn"]
+
+[tool.hatch.build.targets.wheel.shared-data]
+"src/mnn/web/static" = "mnn/web/static"
+
+[tool.hatch.build.targets.wheel.force-include]
+"src/mnn/web/static" = "mnn/web/static"
 
 [tool.uv]
 package = true

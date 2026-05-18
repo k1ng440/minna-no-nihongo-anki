@@ -22,6 +22,7 @@ class Settings:
     pixabay_enabled: bool
     parent_deck_name: str
     output_apkg: Path
+    serve_port: int
 
 
 @lru_cache(maxsize=1)
@@ -39,4 +40,5 @@ def settings() -> Settings:
         pixabay_enabled=os.environ.get("PIXABAY_ENABLED", "0") == "1",
         parent_deck_name=os.environ.get("PARENT_DECK", "Minna no Nihongo"),
         output_apkg=DIST / "MinnaNoNihongo_Vocab.apkg",
+        serve_port=int(os.environ.get("SERVE_PORT", "8765")),
     )

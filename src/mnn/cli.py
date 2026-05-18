@@ -176,6 +176,23 @@ def preview(target: str = typer.Argument(..., help="Lesson:row, e.g. 30:5")) -> 
     pv(int(n), int(idx))
 
 
+@app.command("web")
+def web_build() -> None:
+    """Build static web site into docs/ (for GitHub Pages)."""
+    from mnn.web import builder as web_builder
+    web_builder.run()
+
+
+@app.command("serve")
+def serve(
+    port: int = typer.Option(None, "--port", "-p", help="Override default. Falls back to other ports if busy."),
+    no_open: bool = typer.Option(False, "--no-open", help="Don't auto-open browser."),
+) -> None:
+    """Serve docs/ locally. Default port from SERVE_PORT env (8765); falls back to 8766, 8000, 3000, 5173, OS-assigned."""
+    from mnn.commands.serve import run as serve_run
+    serve_run(port=port, open_browser=not no_open)
+
+
 @app.command("purge-cache")
 def purge_cache(confirm: bool = typer.Option(False, "--confirm", help="Required to actually delete.")) -> None:
     """Wipe cache/ to force a clean rebuild."""

@@ -53,6 +53,7 @@ mnn enrich [pitch|kanji-svg|sentences|mnemonics|quiz|all]
 mnn build                   # assemble dist/MinnaNoNihongo_Vocab.apkg
 mnn all                     # full pipeline
 mnn preview L:N             # render single card → out_preview.html
+mnn web                     # static web UI → docs/ (for GitHub Pages)
 mnn purge-cache --confirm   # nuke cache/
 ```
 
@@ -87,6 +88,28 @@ PARENT_DECK=Minna no Nihongo
 6. **build** — assemble `.apkg` from caches (no network)
 
 Every stage is idempotent: caches are reused on re-run. Pass `--force` (where supported) or `mnn purge-cache --confirm` to start fresh.
+
+## Web UI
+
+```bash
+uv run mnn web
+```
+
+Outputs `docs/` (~51 MB) — browsable static site with the same data as the deck.
+
+**Enable GitHub Pages from `/docs`:**
+1. Push to GitHub.
+2. Settings → Pages → Source: `Deploy from a branch` → Branch: `main` `/docs` → Save.
+3. Site goes live at `https://<user>.github.io/<repo>/`.
+
+Features:
+- Browse all 2,156 words by lesson (sidebar nav)
+- Full-text search across kanji / kana / meaning / mnemonic
+- Filters: has-kanji, has-sentence, has-mnemonic, hide-learned
+- Click any card to expand: pitch-colored kana, example sentence, kanji stroke SVG, LLM mnemonic, inline audio playback
+- Mark cards "learned" → persists in browser `localStorage`
+- Light/dark theme toggle (defaults to `prefers-color-scheme`)
+- Mobile-friendly (responsive grid + hamburger menu)
 
 ## Project layout
 
