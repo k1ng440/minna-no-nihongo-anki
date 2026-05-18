@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="80" height="80">
+  <ellipse cx="50" cy="65" rx="32" ry="24" fill="#e76f51"/>
+  <ellipse cx="50" cy="42" rx="24" ry="22" fill="#f4a261"/>
+  <polygon points="28,30 36,16 42,28" fill="#e76f51"/>
+  <polygon points="72,30 64,16 58,28" fill="#e76f51"/>
+  <polygon points="32,18 38,16 39,24" fill="#ffc6c6"/>
+  <polygon points="68,18 62,16 61,24" fill="#ffc6c6"/>
+  <circle cx="42" cy="42" r="4" fill="#fff"/>
+  <circle cx="58" cy="42" r="4" fill="#fff"/>
+  <circle cx="42" cy="42" r="2.5" fill="#222"/>
+  <circle cx="58" cy="42" r="2.5" fill="#222"/>
+  <path d="M44 54 Q50 58 56 54" stroke="#c0392b" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <path d="M76 70 Q88 60 84 78" fill="#e76f51"/>
+  <text x="50" y="92" text-anchor="middle" font-size="9" fill="#666">kitsune</text>
+</svg>

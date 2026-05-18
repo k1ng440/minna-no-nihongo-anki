@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="80" height="80">
+  <ellipse cx="50" cy="65" rx="34" ry="26" fill="#00b4d8"/>
+  <ellipse cx="50" cy="40" rx="26" ry="24" fill="#90e0ef"/>
+  <polygon points="26,28 34,12 42,26" fill="#0077b6"/>
+  <polygon points="74,28 66,12 58,26" fill="#0077b6"/>
+  <circle cx="42" cy="40" r="4.5" fill="#fff"/>
+  <circle cx="58" cy="40" r="4.5" fill="#fff"/>
+  <circle cx="42" cy="40" r="3" fill="#03045e"/>
+  <circle cx="58" cy="40" r="3" fill="#03045e"/>
+  <path d="M43 52 Q50 58 57 52" stroke="#03045e" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <path d="M18 60 L8 50 L18 55 Z" fill="#0077b6"/>
+  <path d="M82 60 L92 50 L82 55 Z" fill="#0077b6"/>
+  <circle cx="38" cy="48" r="2" fill="#ffd166"/>
+  <circle cx="62" cy="48" r="2" fill="#ffd166"/>
+  <text x="50" y="92" text-anchor="middle" font-size="9" fill="#666">ryūko</text>
+</svg>

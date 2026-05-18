@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="80" height="80">
+  <ellipse cx="50" cy="55" rx="28" ry="24" fill="#ffd6a5"/>
+  <ellipse cx="50" cy="40" rx="20" ry="18" fill="#fff3c4"/>
+  <circle cx="42" cy="38" r="3" fill="#222"/>
+  <circle cx="58" cy="38" r="3" fill="#222"/>
+  <path d="M44 46 Q50 50 56 46" stroke="#c0392b" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <ellipse cx="35" cy="62" rx="5" ry="3" fill="#ffc6c6"/>
+  <ellipse cx="65" cy="62" rx="5" ry="3" fill="#ffc6c6"/>
+  <text x="50" y="92" text-anchor="middle" font-size="9" fill="#666">tamago</text>
+</svg>
