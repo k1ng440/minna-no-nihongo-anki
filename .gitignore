@@ -58,13 +58,13 @@ coverage.xml
 *.pem
 *.key
 
-# Generated pipeline data
-cache/
-data/
-audio/
-audio_sent/
-svg/
-images/
+# Generated pipeline data (project root only, NOT docs/)
+/cache/
+/data/
+/audio/
+/audio_sent/
+/svg/
+/images/
 
 # Build output
 out_preview.html
