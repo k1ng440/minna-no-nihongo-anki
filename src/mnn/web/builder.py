@@ -66,7 +66,7 @@ def _gather() -> dict:
                 "sentence_audio": sent.get("audio", "") if sent and (AUDIO_SENT / sent.get("audio", "")).exists() else "",
                 "kanji_svgs": [svg_map[c] for c in kanji if c in svg_map],
                 "mnemonic": mnem.get(row["guid"]) or "",
-                "mnemonic_bn": bn_mnem.get(row["guid"]) or "",
+                "mnemonic_bn": "",
                 "theme": theme["color"],
                 "emoji": theme["emoji"],
             })

@@ -155,7 +155,7 @@ def run() -> None:
                     kanji_html, html.escape(mnem.get(row["guid"]) or ""), "",
                     mascot_svg, theme["color"], theme["emoji"], progress,
                     html.escape(bn_meanings.get(meaning) or ""),
-                    html.escape(bn_mnem.get(row["guid"]) or ""),
+                    "",  # MnemonicBn — intentionally omitted, quality not yet acceptable
                     sent_bn,
                 ],
                 guid=genanki.guid_for(row["guid"]),
