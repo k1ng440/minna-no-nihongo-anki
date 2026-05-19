@@ -2,6 +2,7 @@
 import asyncio
 import json
 import re
+import unicodedata
 
 from mnn import log
 from mnn.config import settings
@@ -11,8 +12,88 @@ from mnn.util.io import read_json, write_json
 
 logger = log.get(__name__)
 OUT_DIR = CACHE / "mnemonics_bn"
+MEANINGS_BN_DIR = CACHE / "meanings_bn"
 
 BATCH_SIZE = 5
+
+# Bangla synonym groups — if mnemonic contains any token from a group, treat
+# any other token in the same group as effectively present. Catches paraphrase
+# (e.g. মানুষ ≈ লোক ≈ নাগরিক). Conservative list — only obvious synonyms.
+BN_SYNONYMS = [
+    {"মানুষ", "লোক", "নাগরিক", "জন", "ব্যক্তি"},
+    {"ডাক্তার", "চিকিৎসক"},
+    {"বিদ্যুৎ", "কারেন্ট", "ইলেকট্রিসিটি", "ইলেক্ট্রিসিটি"},
+    {"হাসপাতাল", "ক্লিনিক"},
+    {"বিশ্ববিদ্যালয়", "ইউনিভার্সিটি", "কলেজ", "ভার্সিটি"},
+    {"কর্মচারী", "চাকুরিজীবী", "কর্মী", "এমপ্লয়ি", "কর্মকর্তা"},
+    {"ছাত্র", "ছাত্রী", "শিক্ষার্থী", "স্টুডেন্ট"},
+    {"শিক্ষক", "স্যার", "শিক্ষিকা", "টিচার", "শিক্ষকতা", "শিক্ষকত্ব"},
+    {"হ্যাঁ", "জি", "হা", "জ্বি"},
+    {"না", "নয়", "নাহ", "নো"},
+    {"কে", "কারা", "কোন"},
+    {"বছর", "বয়স", "বয়সী", "বয়সে"},
+    {"প্রথম", "প্রথমবার", "নতুন", "সাক্ষাত"},
+    {"কোম্পানি", "অফিস", "প্রতিষ্ঠান"},
+    {"ব্যাংক", "ব্যাঙ্ক"},
+    {"গবেষক", "রিসার্চার"},
+    {"ইঞ্জিনিয়ার", "প্রকৌশলী"},
+    {"আদর", "আদুরে", "ভালোবাসা", "স্নেহ", "প্রিয়", "ডাকনাম"},
+    {"সম্মান", "সম্মানসূচক", "শ্রদ্ধা", "জনাব", "জনাবা", "মিস্টার"},
+    {"ভাই", "ভাইরা", "বোন", "বোনেরা", "সবাই"},
+    {"নাম", "ডাকনাম"},
+    {"টেলার", "ক্যাশিয়ার", "কর্মচারী"},
+    {"স্নাতকোত্তর", "মাস্টার্স", "পোস্টগ্র্যাজুয়েট", "গবেষক"},
+    {"মাফ", "ক্ষমা", "দুঃখিত", "সরি"},
+    {"অন্যটা", "অন্য", "অন্যটি", "সম্মানীয়", "ওই"},
+    {"এঁরা", "এঁকে", "ইনি", "ইনিই"},
+]
+
+
+def _synonym_set(token: str) -> set[str]:
+    """Return set containing token + its synonyms (or just {token} if none)."""
+    for grp in BN_SYNONYMS:
+        if token in grp:
+            return grp
+    return {token}
+
+
+def _extract_meaning_keywords(bn_meaning: str | None) -> list[set[str]]:
+    """Extract Bangla content tokens (with synonyms) from meaning string.
+
+    Returns list of synonym sets — mnemonic must contain at least one token
+    from at least one set to pass accuracy check.
+    """
+    if not bn_meaning:
+        return []
+    parts = re.split(r"[,/]", bn_meaning)
+    out = []
+    for p in parts:
+        p = re.sub(r"\([^)]*\)", "", p).strip()
+        if not p:
+            continue
+        toks = [t for t in p.split() if len(t) >= 2]
+        if not toks:
+            continue
+        # use longest token as keyword
+        longest = max(toks, key=len)
+        out.append(_synonym_set(longest))
+    return out
+
+
+def _validate_accuracy(text: str, keyword_sets: list[set[str]]) -> bool:
+    """Mnemonic must contain at least one token from any synonym set.
+
+    Bengali has NFC vs NFD codepoint differences for characters like য় (U+09DF
+    vs U+09AF+U+09BC) — normalize both sides to NFC before substring check.
+    """
+    if not keyword_sets:
+        return True  # no reference data, skip
+    text_nfc = unicodedata.normalize("NFC", text)
+    for grp in keyword_sets:
+        for tok in grp:
+            if unicodedata.normalize("NFC", tok) in text_nfc:
+                return True
+    return False
 
 SYSTEM = (
     "তুমি একজন বাংলাদেশী শিক্ষক। জাপানি শব্দ মুখস্থ করার জন্য keyword-link পদ্ধতিতে বাংলা mnemonic লেখো।\n\n"
@@ -26,10 +107,25 @@ SYSTEM = (
     "৭. বাক্য অসম্পূর্ণ রেখো না। প্রতিটি বাক্যে দাঁড়ি (।) দাও।\n"
     "৮. বানোয়াট তথ্য বা ভুল অর্থ লেখো না।\n"
     "৯. দেশ/স্থানের নাম বাংলায় লেখো: কোরিয়া, থাইল্যান্ড, চীন, জার্মানি, জাপান, ফ্রান্স, ব্রাজিল, আমেরিকা, ইংল্যান্ড, ভারত, ইন্দোনেশিয়া, ভিয়েতনাম। ইংরেজি/রোমান বানান (Korea, Thailand, China) ব্যবহার নিষিদ্ধ।\n\n"
-    "উদাহরণ:\n"
-    "শব্দ: せんせい (sensei) — শিক্ষক\n"
+    "উদাহরণ:\n\n"
+    "[ব্যক্তি/পেশা] せんせい (sensei) → শিক্ষক\n"
     "ভালো: \"সেন-সেই শুনলে মনে করো ক্লাসে স্যার এসে বললেন 'সবাই সেই দিকে তাকাও!' সেন-সেই মানেই শিক্ষক।\"\n"
-    "খারাপ (এড়িয়ে যাবে): \"sen মানে শব্দ, sei মানে বলা\" (বানোয়াট etymology), \"teacher\" (ইংরেজি)।\n\n"
+    "খারাপ: \"sen মানে শব্দ, sei মানে বলা\" (বানোয়াট ব্যুৎপত্তি)।\n\n"
+    "[দেশের নাম] ドイツ (doitsu) → জার্মানি\n"
+    "ভালো: \"ডোইৎসু শুনলে মনে করো জার্মানিতে গিয়ে তুমি বাটিতে মিষ্টি দই খাচ্ছ। দই থেকে মনে রাখো ডোইৎসু মানেই জার্মানি।\"\n"
+    "খারাপ: \"ডোইৎসু মানে গুণ\" (ভুল অর্থ), \"Germany\" (ইংরেজি)।\n\n"
+    "[প্রত্যয়/particle] ～じん (-jin) → কোনো দেশের নাগরিক\n"
+    "ভালো: \"কল্পনা করো বোতলের জিন একেক দেশের পোশাক পরে বের হচ্ছে। দেশের নামের শেষে জিন যোগ করলেই সেই দেশের নাগরিক বোঝায়, যেমন নিহন-জিন মানে জাপানি।\"\n"
+    "খারাপ: কেবল ব্যাখ্যা, কোনো কীওয়ার্ড-লিংক নেই।\n\n"
+    "[বিদ্যুৎ/বস্তু] でんき (denki) → বিদ্যুৎ\n"
+    "ভালো: \"দেন-কি শুনলে মনে করো বিদ্যুৎ চলে যাওয়ায় তুমি চিৎকার করছ, 'কারেন্ট দেন কি দেন না?' দেন-কি মানে বিদ্যুৎ।\"\n"
+    "খারাপ: \"দেন মানে দেওয়া, কি মানে কী\" (বানোয়াট কাঞ্জি ব্যুৎপত্তি)।\n\n"
+    "[অভিবাদন/phrase] はじめまして (hajimemashite) → প্রথম সাক্ষাতের অভিবাদন\n"
+    "ভালো: \"হাজিমে শুনলে মনে করো 'হাজি সাহেবের মেয়ে'র সাথে প্রথমবার দেখা। হাজিমেমাশিতে মানে প্রথম পরিচয়ের অভিবাদন।\"\n"
+    "খারাপ: \"hajime means start, mashite means meeting\" (ইংরেজি + বানোয়াট ব্যুৎপত্তি)।\n\n"
+    "[direct cognate] エンジニア (enjinia) → ইঞ্জিনিয়ার\n"
+    "ভালো: \"এনজিনিয়া শুনতে হুবহু ইঞ্জিনিয়ার শব্দের মতো — কঠিন কিছু মনে রাখার দরকার নেই।\"\n"
+    "খারাপ: জোর করে অপ্রাসঙ্গিক imagery বসানো।\n\n"
     "ব্যবহারকারী JSON list এ একাধিক শব্দ দেবে। তুমি কেবল valid JSON object ফেরত দাও — "
     '{"results": [{"id": "<id>", "mnemonic": "<বাংলা>"}, ...]}। '
     "কোনো ব্যাখ্যা, markdown, code fence নয়। শুধু JSON।"
@@ -86,7 +182,7 @@ def _parse_batch_response(text: str) -> dict[str, str]:
     return out
 
 
-async def _call_batch(client, sem, model, batch: list[dict], retries=4) -> dict[str, str]:
+async def _call_batch(client, sem, model, batch: list[dict], retries=4, accuracy_keywords: dict[str, list[set[str]]] | None = None) -> dict[str, str]:
     user_payload = {"words": [
         {"id": r["guid"], "word": r["kanji"] or r["kana"], "reading": r["kana"], "meaning": r["meaning"]}
         for r in batch
@@ -98,6 +194,7 @@ async def _call_batch(client, sem, model, batch: list[dict], retries=4) -> dict[
         f"{json.dumps(user_payload, ensure_ascii=False)}"
     )
     accumulated: dict[str, str] = {}
+    soft_fail: dict[str, str] = {}
     pending = batch
     for attempt in range(retries):
         if not pending:
@@ -129,25 +226,41 @@ async def _call_batch(client, sem, model, batch: list[dict], retries=4) -> dict[
                 still_pending = []
                 for r in pending:
                     m = parsed.get(r["guid"])
-                    if m and _validate(m):
-                        accumulated[r["guid"]] = m
-                    else:
+                    if not m or not _validate(m):
                         still_pending.append(r)
+                        continue
+                    kw = (accuracy_keywords or {}).get(r["guid"], [])
+                    if not _validate_accuracy(m, kw):
+                        # passes script/length but misses meaning — retry
+                        soft_fail[r["guid"]] = m
+                        still_pending.append(r)
+                        continue
+                    accumulated[r["guid"]] = m
                 if still_pending and len(still_pending) < len(pending):
                     logger.debug("partial: %d/%d ok att%d", len(pending) - len(still_pending), len(pending), attempt)
                 pending = still_pending
             except Exception as e:
                 logger.debug("batch err att%d: %s", attempt, type(e).__name__)
                 await asyncio.sleep(2 ** attempt)
+    # Accept soft-fail candidates (passed _validate but missed accuracy keyword)
+    if pending and soft_fail:
+        for r in list(pending):
+            if r["guid"] in soft_fail:
+                accumulated[r["guid"]] = soft_fail[r["guid"]]
+                pending.remove(r)
+                logger.debug("soft-fail accepted: %s", r["guid"])
     if pending:
         logger.warning("gave up on %d items after %d attempts", len(pending), retries)
     return accumulated
 
 
-async def _gen_for_rows(client, sem, model, rows: list[dict]) -> dict[str, str | None]:
+async def _gen_for_rows(client, sem, model, rows: list[dict], accuracy_keywords: dict[str, list[set[str]]] | None = None) -> dict[str, str | None]:
     cache: dict[str, str | None] = {}
     batches = [rows[i:i + BATCH_SIZE] for i in range(0, len(rows), BATCH_SIZE)]
-    results = await asyncio.gather(*(_call_batch(client, sem, model, b) for b in batches))
+    results = await asyncio.gather(*(
+        _call_batch(client, sem, model, b, accuracy_keywords=accuracy_keywords)
+        for b in batches
+    ))
     for batch, got in zip(batches, results):
         for r in batch:
             cache[r["guid"]] = got.get(r["guid"]) or None
@@ -173,13 +286,19 @@ async def run(lessons: list[int] | None = None, regen: bool = False) -> None:
         sidecar = OUT_DIR / f"lesson_{n}.json"
         cache: dict[str, str | None] = read_json(sidecar) if sidecar.exists() else {}
         rows = read_json(cleaned)
+        bn_map_path = MEANINGS_BN_DIR / f"lesson_{n}.json"
+        bn_map: dict[str, str | None] = read_json(bn_map_path) if bn_map_path.exists() else {}
+        accuracy_kw = {
+            r["guid"]: _extract_meaning_keywords(bn_map.get(r["meaning"]))
+            for r in rows
+        }
         if regen:
             todo = rows
         else:
             todo = [r for r in rows if not cache.get(r["guid"])]
         if todo:
             logger.info("L%d: %d todo (%d batches)", n, len(todo), (len(todo) + BATCH_SIZE - 1) // BATCH_SIZE)
-            got = await _gen_for_rows(client, sem, s.llm_model, todo)
+            got = await _gen_for_rows(client, sem, s.llm_model, todo, accuracy_keywords=accuracy_kw)
             for guid, text in got.items():
                 cache[guid] = text
             write_json(sidecar, cache)
