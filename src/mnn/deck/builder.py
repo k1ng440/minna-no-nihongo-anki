@@ -23,9 +23,15 @@ logger = log.get(__name__)
 INFO_NOTE_GUID = "mnn-info-start-here-v6"
 
 
+PER_STROKE = 0.8
+STROKE_DURATION = 1.2
+KANJI_GAP = 0.4
+
+
 def _kanji_svg_html(kanji: str, svg_map: dict[str, str]) -> str:
-    """Inline SVG (Anki webview blocks <img src=*.svg> on some platforms)."""
+    """Inline SVG with cumulative animation-delay so kanji animate sequentially."""
     out = []
+    offset = 0.0
     for ch in kanji:
         if ch not in svg_map:
             continue
@@ -33,13 +39,19 @@ def _kanji_svg_html(kanji: str, svg_map: dict[str, str]) -> str:
         if not svg_path.exists():
             continue
         svg_text = svg_path.read_text()
-        # strip XML decl + comments + DOCTYPE (internal subset spans multiple lines)
         svg_text = re.sub(r"<\?xml[^>]*\?>", "", svg_text)
         svg_text = re.sub(r"<!--.*?-->", "", svg_text, flags=re.DOTALL)
-        # DOCTYPE may have internal subset [ ... ] with nested > chars
         svg_text = re.sub(r"<!DOCTYPE\b.*?\]\s*>", "", svg_text, count=1, flags=re.DOTALL)
         svg_text = re.sub(r"<!DOCTYPE\b[^>]*>", "", svg_text, count=1)
+        if offset > 0:
+            svg_text = re.sub(
+                r"animation-delay:\s*([0-9.]+)s",
+                lambda m, o=offset: f"animation-delay: {float(m.group(1)) + o:.2f}s",
+                svg_text,
+            )
         out.append(f'<span class="kanji-svg">{svg_text.strip()}</span>')
+        n_strokes = len(re.findall(r'id="kvg:[0-9a-f]+-s\d+"', svg_text))
+        offset += max(0, n_strokes - 1) * PER_STROKE + STROKE_DURATION + KANJI_GAP
     return "".join(out)
 
 
