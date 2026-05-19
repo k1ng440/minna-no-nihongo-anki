@@ -1,6 +1,6 @@
 [project]
 name = "mnn-vocab"
-version = "1.0.0"
+version = "1.1.0"
 description = "Enriched Anki deck generator for Minna no Nihongo I + II — 2,156 words with native audio, pitch accent, kanji stroke animations, mnemonics, and quizzes."
 readme = "README.md"
 requires-python = ">=3.11"

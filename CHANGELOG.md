@@ -11,6 +11,52 @@ a breaking change.
 
 ## [Unreleased]
 
+## [1.1.0] — 2026-05-20
+
+GUIDs, note model IDs, and deck IDs are unchanged — review history is preserved.
+
+### Added
+
+- Bangladeshi Bengali (Bangla) localization for word meanings and example
+  sentence translations. Renders alongside the English fields on every card.
+- Live web demo: <https://k1ng440.github.io/minna-no-nihongo-anki/>. Build via
+  `mnn web`, serve locally via `mnn serve`.
+- `mnn enrich mnemonics-bn` gains `--lesson N` (repeatable) and `--regen` flags
+  for targeted regeneration.
+
+### Fixed
+
+- **251 wrong English meanings** auto-detected across 46 lessons via an LLM
+  audit and patched. Notable: `イギリス` was labelled "Brother", `ドイツ` was
+  labelled "Virtue", a Vietnamese fragment had leaked into one entry, and an
+  Excel auto-format had turned `1/4` into `4-Jan`. Affected Bangla meanings
+  re-translated.
+- KanjiVG SVGs now embed inline in cards (Anki webviews on some platforms
+  block `<img src=*.svg>`); DOCTYPE + internal subset stripped before
+  embedding.
+- Stroke-order animation replay now uses `setTimeout` instead of the
+  `offsetWidth` reflow trick, which was unreliable inside Anki's constrained
+  webview.
+- Multi-kanji words now animate sequentially with per-kanji delays derived
+  from stroke counts, instead of all kanji firing at once.
+- Card `onclick` handlers switched from ES6 arrow syntax to traditional
+  `function` for compatibility with older Anki clients.
+- Web build now ships `docs/data`, `docs/audio`, and `docs/svg` so the GitHub
+  Pages demo loads on a fresh clone.
+
+### Changed
+
+- The Bangla mnemonic field is suppressed in the deck and web build for this
+  release while the generation pipeline matures. The cache, prompt, validator,
+  and mustache template are kept in place — re-enabling is a one-line revert
+  in `src/mnn/deck/builder.py` and `src/mnn/web/builder.py` once mnemonic
+  quality is uniformly acceptable across all 50 lessons.
+- Bangla mnemonic generation pipeline (still cached, not rendered) now uses a
+  strict keyword-link prompt with category-spanning few-shots, a per-row
+  script/length/punctuation validator, a meaning-accuracy check against
+  `cache/meanings_bn/` with Bangla synonym groups, and a soft-fail accumulator
+  across retries so paraphrase doesn't yield a `null`.
+
 ## [1.0.0] — 2026-05-18
 
 Initial public release.
