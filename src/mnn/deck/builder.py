@@ -33,9 +33,12 @@ def _kanji_svg_html(kanji: str, svg_map: dict[str, str]) -> str:
         if not svg_path.exists():
             continue
         svg_text = svg_path.read_text()
-        # strip XML decl + comments — Anki cards expect HTML fragments
+        # strip XML decl + comments + DOCTYPE (internal subset spans multiple lines)
         svg_text = re.sub(r"<\?xml[^>]*\?>", "", svg_text)
         svg_text = re.sub(r"<!--.*?-->", "", svg_text, flags=re.DOTALL)
+        # DOCTYPE may have internal subset [ ... ] with nested > chars
+        svg_text = re.sub(r"<!DOCTYPE\b.*?\]\s*>", "", svg_text, count=1, flags=re.DOTALL)
+        svg_text = re.sub(r"<!DOCTYPE\b[^>]*>", "", svg_text, count=1)
         out.append(f'<span class="kanji-svg">{svg_text.strip()}</span>')
     return "".join(out)
 
