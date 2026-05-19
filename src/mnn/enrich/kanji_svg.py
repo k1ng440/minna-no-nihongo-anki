@@ -19,8 +19,9 @@ stroke-dasharray: 200; stroke-dashoffset: 200; animation: draw 1.2s forwards; }
 </style>"""
 
 REPLAY_JS = (
-    "this.querySelectorAll('path').forEach(function(p){"
-    "p.style.animation='none';void p.offsetWidth;p.style.animation='';});"
+    "var s=this;s.querySelectorAll('path').forEach(function(p){"
+    "p.style.animation='none';});setTimeout(function(){"
+    "s.querySelectorAll('path').forEach(function(p){p.style.animation='';});},20);"
 )
 
 MAP_FILE = CACHE / "kanji_svg_map.json"
