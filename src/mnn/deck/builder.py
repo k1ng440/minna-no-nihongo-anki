@@ -1,6 +1,7 @@
 """Assemble enriched .apkg from caches. No network."""
 import html
 import json
+import re
 
 import genanki
 
@@ -23,10 +24,19 @@ INFO_NOTE_GUID = "mnn-info-start-here-v6"
 
 
 def _kanji_svg_html(kanji: str, svg_map: dict[str, str]) -> str:
+    """Inline SVG (Anki webview blocks <img src=*.svg> on some platforms)."""
     out = []
     for ch in kanji:
-        if ch in svg_map:
-            out.append(f'<span class="kanji-svg"><img src="{svg_map[ch]}"></span>')
+        if ch not in svg_map:
+            continue
+        svg_path = SVG / svg_map[ch]
+        if not svg_path.exists():
+            continue
+        svg_text = svg_path.read_text()
+        # strip XML decl + comments — Anki cards expect HTML fragments
+        svg_text = re.sub(r"<\?xml[^>]*\?>", "", svg_text)
+        svg_text = re.sub(r"<!--.*?-->", "", svg_text, flags=re.DOTALL)
+        out.append(f'<span class="kanji-svg">{svg_text.strip()}</span>')
     return "".join(out)
 
 
