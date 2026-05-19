@@ -156,11 +156,14 @@ def enrich_meanings_bn() -> None:
 
 
 @enrich_app.command("mnemonics-bn")
-def enrich_mnemonics_bn() -> None:
+def enrich_mnemonics_bn(
+    lesson: list[int] = typer.Option(None, "--lesson", "-l", help="Only this lesson (repeatable). Default: all."),
+    regen: bool = typer.Option(False, "--regen", help="Ignore cache, regenerate all."),
+) -> None:
     """LLM Bangla mnemonics (Bangladeshi modern Bengali)."""
     from mnn.enrich import mnemonics_bn
     import asyncio
-    asyncio.run(mnemonics_bn.run())
+    asyncio.run(mnemonics_bn.run(lessons=lesson or None, regen=regen))
 
 
 @enrich_app.command("sentences-bn")
