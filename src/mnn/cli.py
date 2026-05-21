@@ -220,6 +220,13 @@ def web_build() -> None:
     web_builder.run()
 
 
+@app.command("verify")
+def verify() -> None:
+    """Verify vocab against Jisho API for discrepancies."""
+    from mnn.commands.verify_jisho import run
+    run()
+
+
 @app.command("serve")
 def serve(
     port: int = typer.Option(None, "--port", "-p", help="Override default. Falls back to other ports if busy."),

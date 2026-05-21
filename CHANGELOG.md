@@ -11,6 +11,12 @@ a breaking change.
 
 ## [Unreleased]
 
+## [1.1.1] — 2026-05-22
+
+### Fixed
+
+- **めいし** (Lesson 2, #13): Changed kanji from 名詞 (noun) to 名刺 (business card) with corrected meaning and example sentence.
+
 ## [1.1.0] — 2026-05-20
 
 GUIDs, note model IDs, and deck IDs are unchanged — review history is preserved.

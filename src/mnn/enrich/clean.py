@@ -18,6 +18,7 @@ CJK = r"㐀-鿿"
 
 MANUAL_OVERRIDES: dict[tuple[int, str], dict] = {
     (30, "6"): {"kanji": "相談します", "kana": "そうだんします", "meaning": "consult"},
+    (2, "13"): {"kanji": "名刺", "kana": "めいし", "meaning": "business card"},
 }
 
 
